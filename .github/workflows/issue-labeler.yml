@@ -1,0 +1,102 @@
+name: 🏷️ Issue Labeler
+
+on:
+  issues:
+    types: [opened, edited]
+
+jobs:
+  labeler:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 🏷️ Auto-label Issues
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const issue = context.payload.issue;
+            const title = issue.title.toLowerCase();
+            const body = issue.body.toLowerCase();
+            const labels = [];
+            
+            // Determine issue type based on title and body
+            if (title.includes('[bug]') || title.includes('bug') || body.includes('error') || body.includes('compilation')) {
+              labels.push('bug');
+            }
+            
+            if (title.includes('[feature]') || title.includes('feature') || body.includes('new') || body.includes('add')) {
+              labels.push('enhancement');
+            }
+            
+            if (title.includes('[content]') || title.includes('content') || body.includes('improve') || body.includes('better')) {
+              labels.push('content');
+            }
+            
+            if (title.includes('[question]') || title.includes('question') || body.includes('how') || body.includes('what') || body.includes('why')) {
+              labels.push('question');
+            }
+            
+            // Add learning level labels
+            if (body.includes('beginner') || body.includes('new to java') || body.includes('first time')) {
+              labels.push('beginner-friendly');
+            }
+            
+            if (body.includes('advanced') || body.includes('expert') || body.includes('complex')) {
+              labels.push('advanced');
+            }
+            
+            // Add topic-specific labels
+            if (body.includes('day 1') || body.includes('day 2') || body.includes('day 3') || body.includes('basics')) {
+              labels.push('java-basics');
+            }
+            
+            if (body.includes('oop') || body.includes('class') || body.includes('object') || body.includes('inheritance')) {
+              labels.push('object-oriented');
+            }
+            
+            if (body.includes('collection') || body.includes('arraylist') || body.includes('hashmap')) {
+              labels.push('collections');
+            }
+            
+            if (body.includes('thread') || body.includes('concurrency') || body.includes('multithreading')) {
+              labels.push('concurrency');
+            }
+            
+            if (body.includes('stream') || body.includes('lambda') || body.includes('functional')) {
+              labels.push('modern-java');
+            }
+            
+            if (body.includes('database') || body.includes('jdbc') || body.includes('sql')) {
+              labels.push('database');
+            }
+            
+            if (body.includes('web') || body.includes('servlet') || body.includes('jsp') || body.includes('rest')) {
+              labels.push('web-development');
+            }
+            
+            // Add priority labels
+            if (body.includes('urgent') || body.includes('critical') || body.includes('blocking')) {
+              labels.push('high-priority');
+            }
+            
+            if (body.includes('nice to have') || body.includes('future') || body.includes('suggestion')) {
+              labels.push('low-priority');
+            }
+            
+            // Add help wanted for questions
+            if (labels.includes('question')) {
+              labels.push('help-wanted');
+            }
+            
+            // Add needs-triage if no specific type identified
+            if (labels.length === 0) {
+              labels.push('needs-triage');
+            }
+            
+            // Add the labels
+            if (labels.length > 0) {
+              await github.rest.issues.addLabels({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issue.number,
+                labels: labels
+              });
+            } 

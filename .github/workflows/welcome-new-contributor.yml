@@ -1,0 +1,91 @@
+name: 🎊 Welcome New Contributors
+
+on:
+  pull_request:
+    types: [opened]
+
+jobs:
+  welcome:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 🎊 Welcome New Contributors
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const { data: commits } = await github.rest.repos.listCommits({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              sha: context.payload.pull_request.head.sha,
+            });
+            
+            // Check if this is the first contribution to the repo
+            const { data: allCommits } = await github.rest.repos.listCommits({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+            });
+            
+            const isFirstTimeContributor = allCommits.every(commit => 
+              commit.author.login !== context.payload.pull_request.user.login
+            );
+            
+            if (isFirstTimeContributor) {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.payload.pull_request.number,
+                body: `
+                🎊 **Welcome to the Java Community!** 🎊
+                
+                This is your very first contribution to our repository! We're absolutely thrilled to have you join our mission to make Java learning accessible to everyone! 🌟
+                
+                **You're Making History:**
+                - 🏆 You're helping build the future of Java education
+                - 🌍 Your contribution will help students worldwide
+                - 🚀 You're joining a community of passionate learners and educators
+                - 💪 You're taking the first step in open source contribution
+                
+                **What Makes This Special:**
+                - 📚 You're contributing to a comprehensive 50-day learning journey
+                - 🎯 Your work will help thousands of students master Java
+                - 🤝 You're becoming part of a supportive learning community
+                - 🌟 You're helping create better educational resources
+                
+                **Your Contribution Journey:**
+                - ✅ We'll review your PR with extra care and encouragement
+                - 💬 We'll provide detailed, helpful feedback
+                - 🎯 We'll guide you through any improvements needed
+                - 🚀 Once approved, your contribution will be merged!
+                - 🏅 You'll be recognized as a valued community member
+                
+                **Tips for Success:**
+                - 📖 Review our [CONTRIBUTING.md](CONTRIBUTING.md) thoroughly
+                - 🧪 Test your code to ensure it works correctly
+                - 📝 Write clear, beginner-friendly explanations
+                - 💡 Don't hesitate to ask questions in the comments
+                
+                **Community Support:**
+                - 💬 Our team is here to help you succeed
+                - 🤝 We want this to be a positive learning experience
+                - 📚 We'll guide you through any challenges
+                - 🌟 We celebrate every contribution, big or small
+                
+                **Next Steps:**
+                - ⏱️ We'll review your PR within 24-48 hours
+                - 💬 We'll provide constructive feedback
+                - 🔄 We may suggest small improvements
+                - 🚀 Once approved, your work will be live!
+                
+                Welcome to the Java family! You're helping make Java learning better for everyone! 💪✨
+                
+                **P.S.** Don't forget to star ⭐ our repository if you find it helpful!
+                `
+              });
+              
+              // Add special labels for first-time contributors
+              await github.rest.issues.addLabels({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.payload.pull_request.number,
+                labels: ['first-time-contributor', 'welcome', 'community-hero']
+              });
+            } 

@@ -1,0 +1,63 @@
+name: 👋 Greetings
+
+on:
+  issues:
+    types: [opened]
+  pull_request:
+    types: [opened]
+
+jobs:
+  greeting:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 👋 Greet Issue Authors
+        if: github.event_name == 'issues'
+        uses: actions/first-interaction@v1
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          issue-message: |
+            👋 **Welcome to Java**
+            
+            Thank you for opening an issue! 🎉
+            
+            We're excited to help you on your Java learning journey. Our team will review your issue and get back to you soon.
+            
+            **Quick Tips:**
+            - 📖 Check out our [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines
+            - 🔍 Search existing issues to avoid duplicates
+            - 💡 Be specific and include relevant details
+            
+            **Learning Resources:**
+            - Start with [Day 01](Day%2001%20-%20Java%20Basics%20and%20Setup/) if you're new
+            - Check the [main README](README.md) for an overview
+            - Join our community discussions!
+            
+            Happy coding! 🚀
+
+      - name: 🎉 Greet Pull Request Authors
+        if: github.event_name == 'pull_request'
+        uses: actions/first-interaction@v1
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          pr-message: |
+            🎉 **Thank you for your contribution to Java!**
+            
+            We're thrilled to see your pull request! This helps make Java learning better for everyone. 🌟
+            
+            **What happens next:**
+            - ✅ Our team will review your changes
+            - 🔍 We'll check that everything follows our guidelines
+            - 💬 We might ask for small adjustments if needed
+            - 🚀 Once approved, your contribution will be merged!
+            
+            **While you wait:**
+            - 📖 Review our [CONTRIBUTING.md](https://github.com/Zemerik/Java/blob/main/CONTRIBUTING.md) if you haven't already
+            - 🧪 Make sure your code compiles and runs correctly
+            - 📝 Check that documentation is clear and helpful
+            
+            **Your contribution helps:**
+            - 📚 Students learn Java more effectively
+            - 🌍 Build a better learning community
+            - 🚀 Improve the learning experience for everyone
+            
+            Thank you for being part of our Java learning journey! 💪 

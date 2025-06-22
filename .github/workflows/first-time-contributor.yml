@@ -1,0 +1,68 @@
+name: 🎉 First Time Contributor
+
+on:
+  pull_request:
+    types: [opened]
+
+jobs:
+  first-time-contributor:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 🎉 Welcome First Time Contributors
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const { data: commits } = await github.rest.repos.listCommits({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              sha: context.payload.pull_request.head.sha,
+            });
+            
+            const isFirstTimeContributor = commits.every(commit => 
+              commit.author.login === context.payload.pull_request.user.login
+            );
+            
+            if (isFirstTimeContributor) {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.payload.pull_request.number,
+                body: `
+                🎊 **Welcome, First-Time Contributor!** 🎊
+                
+                This is your first contribution to Java! We're so excited to have you join our community! 🌟
+                
+                **Special Recognition:**
+                - 🏆 You're helping make Java learning better for thousands of students
+                - 🌍 Your contribution impacts the global Java learning community
+                - 🚀 You're taking the first step in open source contribution
+                
+                **What to expect:**
+                - ✅ Our team will review your PR with extra care and encouragement
+                - 💬 We'll provide helpful feedback to help you grow
+                - 🎯 We'll guide you through any necessary changes
+                - 🚀 Your contribution will be merged once everything looks great!
+                
+                **Tips for success:**
+                - 📖 Make sure you've read our [CONTRIBUTING.md](CONTRIBUTING.md)
+                - 🧪 Test your changes thoroughly
+                - 📝 Keep explanations clear and beginner-friendly
+                - 💪 Don't worry if we ask for small adjustments - it's all part of learning!
+                
+                **Community Support:**
+                - 💬 Feel free to ask questions in the PR comments
+                - 🤝 Our community is here to help you succeed
+                - 📚 We want to make this a positive learning experience
+                
+                Welcome to the Java family! You're making a real difference! 💪✨
+                `
+              });
+              
+              // Add first-time contributor label
+              await github.rest.issues.addLabels({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.payload.pull_request.number,
+                labels: ['first-time-contributor', 'welcome']
+              });
+            } 

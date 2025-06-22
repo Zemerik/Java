@@ -1,0 +1,109 @@
+name: 🔍 PR Review Assistant
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  pr-review:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 🔍 Auto-request Review
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const pr = context.payload.pull_request;
+            
+            // Add helpful comment for PR authors
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: pr.number,
+              body: `
+              🔍 **PR Review Process Started**
+              
+              Thank you for your pull request! Here's what happens next:
+              
+              **Review Checklist:**
+              - ✅ Code compiles without errors
+              - ✅ Follows Java coding conventions
+              - ✅ Includes appropriate documentation
+              - ✅ Tests are included (if applicable)
+              - ✅ Changes are focused and well-explained
+              
+              **What we're looking for:**
+              - 🎯 Clear, readable code that helps students learn
+              - 📝 Helpful comments and explanations
+              - 🧪 Working examples that demonstrate concepts
+              - 📚 Beginner-friendly explanations in README files
+              
+              **Review Timeline:**
+              - ⏱️ We aim to review within 24-48 hours
+              - 💬 We'll provide constructive feedback
+              - 🔄 We may ask for small improvements
+              - 🚀 Once approved, your PR will be merged!
+              
+              **Need help?**
+              - 💬 Ask questions in the PR comments
+              - 📖 Check our [CONTRIBUTING.md](CONTRIBUTING.md)
+              - 🤝 Our community is here to help!
+              
+              Thanks for contributing to Java education! 🌟
+              `
+            });
+            
+            // Add appropriate labels based on PR content
+            const title = pr.title.toLowerCase();
+            const body = pr.body.toLowerCase();
+            const labels = [];
+            
+            if (title.includes('fix') || title.includes('bug') || body.includes('fix')) {
+              labels.push('bug-fix');
+            }
+            
+            if (title.includes('feature') || title.includes('add') || body.includes('new')) {
+              labels.push('enhancement');
+            }
+            
+            if (title.includes('content') || title.includes('improve') || body.includes('better')) {
+              labels.push('content-improvement');
+            }
+            
+            if (title.includes('docs') || title.includes('readme') || body.includes('documentation')) {
+              labels.push('documentation');
+            }
+            
+            // Add learning level labels
+            if (body.includes('beginner') || body.includes('basic')) {
+              labels.push('beginner-friendly');
+            }
+            
+            if (body.includes('advanced') || body.includes('complex')) {
+              labels.push('advanced');
+            }
+            
+            // Add topic labels
+            if (body.includes('day 1') || body.includes('day 2') || body.includes('day 3')) {
+              labels.push('java-basics');
+            }
+            
+            if (body.includes('oop') || body.includes('class')) {
+              labels.push('object-oriented');
+            }
+            
+            if (body.includes('collection') || body.includes('arraylist')) {
+              labels.push('collections');
+            }
+            
+            // Add review status
+            labels.push('needs-review');
+            
+            // Add the labels
+            if (labels.length > 0) {
+              await github.rest.issues.addLabels({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: pr.number,
+                labels: labels
+              });
+            } 
